@@ -21,6 +21,7 @@
  （2）Google Protocol Buffers（protobuf）
    Google Protocol Buffers (GPB)是Google内部使用的数据编码方式，旨在用来代替XML进行数据交换。可用于数据序列化与反序列化。
    github地址：https://github.com/google/protobuf
+   使用示例：http://blog.csdn.net/k346k346/article/details/51754431
  （3）Boost的序列化库Serialization
    Boost.Serialization可以创建或重建程序中的等效结构，并保存为二进制数据、文本数据、XML或者有用户自定义的其他文件。
  （4）MFC的序列化
