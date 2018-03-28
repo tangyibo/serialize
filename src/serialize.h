@@ -2,61 +2,13 @@
 #define _SERIALIZE_HEADER_H_
 #include <sstream>   //std::stringstream
 #include <vector>    //std::vector
-#include <stdint.h>  //uint8_t uint16_t uint32_t uint64_t
+#include <list>      //std::list
+#include <set>       //std::set
+#include <iterator>  //
 #include <string.h>  //memcpy
 
-////////////////////////////////////////////////
-//First,Tools function for bytes order in socket
-////////////////////////////////////////////////
-uint16_t swap_2(uint16_t v)
-{
-	uint8_t arr[2];
-	memcpy(arr,&v,2);
-	uint8_t byte;
-
-	byte = arr[0];
-	arr[0] = arr[1];
-	arr[1] = byte;
-	return *(uint16_t*)arr;	
-}
-
-uint32_t swap_4(uint32_t v)
-{
-	uint8_t arr[4];
-	memcpy(arr,&v,4);
-	uint8_t byte;
-
-	byte = arr[0];
-	arr[0] = arr[3];
-	arr[3] = byte;
-
-	byte = arr[1];
-	arr[1] = arr[2];
-	arr[2] = byte;
-
-	return *(uint32_t*)arr;
-}
-
-uint64_t swap_8(uint64_t v)
-{
-	uint32_t low = (uint32_t) (v & 0x00000000FFFFFFFFLL);
-	uint32_t high = (uint32_t) ((v & 0xFFFFFFFF00000000LL) >> 32);
-
-	low = swap_4(low);
-	high = swap_4(high);
-
-	return  (uint64_t) high + (((uint64_t) low) << 32);
-}
-
-bool is_little_endian()
-{
-	int temp=1;
-	uint8_t byte_order=((uint8_t *)&temp)[0];
-	return (byte_order==1);
-}
-
 ////////////////////////////////////////////////////
-// Second,define normal template function
+// define normal template function
 ////////////////////////////////////////////////////
 
 template<typename SerializableType>
@@ -72,7 +24,7 @@ int deserialize(std::string &str,SerializableType& a)
 }
 
 /////////////////////////////////////////////////
-//Third,define special template function
+//define special template function
 //Serialize for C/C++ basic type
 //examples: short,int,float,long long,double
 /////////////////////////////////////////////////
@@ -81,19 +33,7 @@ int deserialize(std::string &str,SerializableType& a)
 std::string serialize(Type& b) \
 { \
 	std::string ret; \
-	Type a=b; \
-	if(is_little_endian()) \
-	{ \
-		size_t size=sizeof(Type);\
-		switch(size) \
-		{ \
-			case 2:a=swap_2(a);break; \
-			case 4:a=swap_4(a);break; \
-			case 8:a=swap_8(a);break; \
-			default:break; \
-		}; \
-	}\
-	ret.append((const char*)&a,sizeof(Type)); \
+	ret.append((const char*)&b,sizeof(Type)); \
 	return ret; \
 }
 
@@ -101,20 +41,7 @@ std::string serialize(Type& b) \
  template<> \
 int deserialize(std::string& str,Type& b)\
 { \
-	Type a; \
-	memcpy(&a,str.data(),sizeof(Type)); \
-        if(is_little_endian()) \
-        { \
-                size_t size=sizeof(Type);\
-                switch(size) \
-                { \
-                        case 2:a=swap_2(a);break; \
-                        case 4:a=swap_4(a);break; \
-                        case 8:a=swap_8(a);break; \
-                        default:break; \
-                }; \
-        } \
-	b=a; \
+	memcpy(&b,str.data(),sizeof(Type)); \
 	return sizeof(Type); \
 }
 
@@ -136,7 +63,7 @@ DEF_BASIC_TYPE_SERIALIZE_AND_DESERIALIZE(unsigned long long int)
 DEF_BASIC_TYPE_SERIALIZE_AND_DESERIALIZE(double)
 
 //////////////////////////////////////
-//Fourth,Serialize for type string
+//Serialize for type string
 /////////////////////////////////////
 
 // for c++ type std::string
@@ -160,7 +87,7 @@ int deserialize(std::string &str,std::string& s)
 }
 
 ////////////////////////////////////////////
-//Fifth, define input and output stream
+//define input and output stream
 //for serialize data struct
 ////////////////////////////////////////////
 
@@ -191,6 +118,22 @@ public:
 		}
 		
 		return *this;
+	}
+
+        template<typename BasicType>
+        OutStream& operator << (std::list<BasicType>& a)
+        {
+		std::vector<BasicType> temp;
+		std::copy(a.begin(), a.end(), std::back_inserter(temp));	
+                return this->operator <<(temp);
+        }
+
+	template<typename BasicType>
+	OutStream& operator << (std::set<BasicType>& a)
+	{
+		std::vector<BasicType> temp;
+		std::copy(a.begin(), a.end(), std::back_inserter(temp));
+		return this->operator <<(temp);
 	}
 
 	std::string str()
@@ -233,6 +176,35 @@ public:
 		return *this;
 	}
 
+	template<typename BasicType>
+        InStream& operator >> (std::list<BasicType>& a)
+	{
+		std::vector<BasicType> temp;
+		InStream& ret=this->operator >>(temp);
+		if(temp.size()>0)
+		{
+			std::copy(temp.begin(), temp.end(), std::back_inserter(a));
+		}
+
+		return ret;
+	}
+
+	template<typename BasicType>
+        InStream& operator >> (std::set<BasicType>& a)
+	{
+		std::vector<BasicType> temp;
+		InStream& ret=this->operator >>(temp);
+		if(temp.size()>0)
+		{
+			for(size_t i=0;i<temp.size();++i)
+			{
+				a.insert(temp[i]);
+			}
+		}
+
+		return ret;
+	}
+
 	int size()
 	{
 		return total-str.size();	
@@ -244,7 +216,7 @@ protected:
 };
 
 ////////////////////////////////////////////
-//Sixth,Serialize for custom class object
+//Serialize for custom class object
 //If your class object want to be serialized,
 //Plese derive for this base class
 ///////////////////////////////////////////
