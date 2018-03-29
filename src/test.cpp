@@ -81,6 +81,7 @@ bool operator ==( const MyTest &lhs, const MyTest &rhs )
 
 TEST( Serialize, BasicType )
 {
+	char x='a';
 	short a=1;
 	int b=2;
 	long c=3;
@@ -88,10 +89,11 @@ TEST( Serialize, BasicType )
 	long long e=5;
 
 	OutStream os;
-	os << a << b << c << d << e ;
+	os << x << a << b << c << d << e ;
 
 	std::string serializestr=os.str( );
 
+	char x1;
 	short a1;
 	int b1;
 	long c1;
@@ -99,8 +101,9 @@ TEST( Serialize, BasicType )
 	long long e1;
 
 	InStream is( serializestr );
-	is >> a1 >> b1 >> c1 >> d1 >> e1;
+	is >> x1 >> a1 >> b1 >> c1 >> d1 >> e1;
 
+	ASSERT_EQ( x, x1 );
 	ASSERT_EQ( a, a1 );
 	ASSERT_EQ( b, b1 );
 	ASSERT_EQ( c, c1 );
