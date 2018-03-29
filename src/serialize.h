@@ -70,7 +70,7 @@ DEF_BASIC_TYPE_SERIALIZE_AND_DESERIALIZE(double)
 template<>
 std::string serialize(std::string& s)
 {
-	int len=s.size()+1;
+	int len=s.size();
 	std::string ret;
 	ret.append(::serialize(len));
 	ret.append(s.data(),len);

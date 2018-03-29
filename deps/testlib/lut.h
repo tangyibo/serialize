@@ -45,7 +45,7 @@ public:
 	template <class X, class Y>   \
 	Tester& name(const X& x, const Y& y) \
 	{\
-		if (! (x op y)) \
+		if (!(x op y)) \
 		{\
 			ss_ << " failed: " << x << (" " #op " ") << y;    \
 			ok_ = false;  \
@@ -59,17 +59,6 @@ public:
 	BINARY_OP(IsGt, >)
 	BINARY_OP(IsLe, <=)
 	BINARY_OP(IsLt, <)
-
-	Tester& IsEq (const std::string&x , const std::string &y)
-	{
- 		if (! x.compare (y))
-		 {
-			ss_ << " failed: " << x << (" == ") << y;    
-			ok_ = false;
- 		}
-
-		 return *this;
- 	}
 
 #undef BINARY_OP
 
