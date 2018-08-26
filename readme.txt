@@ -36,9 +36,9 @@
 --------
 
   本部分代码所实现的C++序列化，支持如下特性：
- （1） 对基本数据类型的序列化；
+ （1）对基本数据类型char,short,int,long,string的序列化；
  （2）支持序列化为socket流；
- （3）支持对std::vector、std::list、std::vector的序列化;
+ （3）支持对std::vector、std::list、std::set、std::map的序列化;
 
 四、参考文献
 --------
