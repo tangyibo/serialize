@@ -12,23 +12,23 @@
      
 ## 二、当前已有的序列化方式
 - （1）JSON文本序列化方式
-  > 例如使用jsoncpp或cJSON等库，将内存中的数据结构序列化为JSON格式的文本串。
+> 例如使用jsoncpp或cJSON等库，将内存中的数据结构序列化为JSON格式的文本串。
   
 - （2）Google Protocol Buffers（protobuf）
-   > Google Protocol Buffers (GPB)是Google内部使用的数据编码方式，旨在用来代替XML进行数据交换。可用于数据序列化与反序列化。
-   > github地址：https://github.com/google/protobuf
-   > 使用示例：http://blog.csdn.net/k346k346/article/details/51754431
+> Google Protocol Buffers (GPB)是Google内部使用的数据编码方式，旨在用来代替XML进行数据交换。可用于数据序列化与反序列化。
+> github地址：https://github.com/google/protobuf
+> 使用示例：http://blog.csdn.net/k346k346/article/details/51754431
    
 - （3）Boost的序列化库Serialization
-   > Boost.Serialization可以创建或重建程序中的等效结构，并保存为二进制数据、文本数据、XML或者有用户自定义的其他文件。
+> Boost.Serialization可以创建或重建程序中的等效结构，并保存为二进制数据、文本数据、XML或者有用户自定义的其他文件。
    
 - （4）MFC的序列化
-  > Windows平台下可使用MFC中的序列化方法。MFC 对 CObject 类中的序列化提供内置支持。因此，所有从 CObject 派生的类都可利用 CObject 的序列化协议。
+> Windows平台下可使用MFC中的序列化方法。MFC 对 CObject 类中的序列化提供内置支持。因此，所有从 CObject 派生的类都可利用 CObject 的序列化协议。
   
 - (5)msgpack的序列化
-   > MessagePack（简称msgpack)是一个高效的二进制序列化格式。它让你像JSON一样可以在各种语言之间交换数据。但是它比JSON更快、更小。小的整数会被编码
+> MessagePack（简称msgpack)是一个高效的二进制序列化格式。它让你像JSON一样可以在各种语言之间交换数据。但是它比JSON更快、更小。小的整数会被编码
 成一个字节，短的字符串仅仅只需要比它的长度多一字节的大小。
-   > 官方网站： http://msgpack.org/ 。
+> 官方网站： http://msgpack.org/ 。
    
 >说明：为了考虑平台的移植性、适用性和高效性，推荐大家使用Google的protobuf和Boost的序列化方案。
  
