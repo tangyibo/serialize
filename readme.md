@@ -39,6 +39,187 @@
 - （2）支持序列化为socket流；
 - （3）支持对std::vector、std::list、std::set、std::map的序列化;
 
-## 四、参考文献
+## 四、使用示例
 
- 参考：http://blog.csdn.net/Kiritow/article/details/53129096
+- 1、对于基本数据类型的序列化
+
+```
+    char x = 'a';
+    short a = 1;
+    int b = 2;
+    long c = 3;
+    float d = 4;
+    long long e = 5;
+
+    OutStream os;
+    os << x << a << b << c << d << e;
+
+    std::string serializestr = os.str();
+
+    char x1;
+    short a1;
+    int b1;
+    long c1;
+    float d1;
+    long long e1;
+
+    InStream is(serializestr);
+    is >> x1 >> a1 >> b1 >> c1 >> d1 >> e1;
+```
+
+- 2、对于自定义类的序列化
+
+步骤一：编写自定义类：自定义的类需要继承自Serializable,并实现serialize()和deserialize()方法：
+
+```
+class MyTest : public Serializable
+{
+public:
+    std::string m_name;
+    int m_age;
+    float m_salary;
+
+public:
+
+    MyTest()
+    {
+        m_name.clear();
+        m_age = 0;
+        m_salary = 0.;
+    }
+
+    MyTest(const char *name, const int age, const float salary)
+    {
+        m_name.assign(name);
+        m_age = age;
+        m_salary = salary;
+    }
+
+    MyTest(const MyTest& other)
+    {
+        m_name = other.m_name;
+        m_age = other.m_age;
+        m_salary = other.m_salary;
+    }
+
+    ~MyTest()
+    {
+        m_name.clear();
+    }
+
+    MyTest& operator=(const MyTest& other)
+    {
+        if (this != &other)
+        {
+            m_name = other.m_name;
+            m_age = other.m_age;
+            m_salary = other.m_salary;
+        }
+
+        return *this;
+    }
+
+    virtual std::string serialize()
+    {
+        OutStream os;
+        os << m_name << m_age << m_salary;
+        return os.str();
+    }
+
+    virtual int deserialize(std::string &str)
+    {
+        InStream is(str);
+        is >> m_name >> m_age>>m_salary;
+        return is.size();
+    }
+
+    void display()
+    {
+        std::cout << m_name << "," << m_age << "," << m_salary << std::endl;
+    }
+};
+
+bool operator==(const MyTest &lhs, const MyTest &rhs)
+{
+    return lhs.m_name == rhs.m_name &&
+            lhs.m_age == rhs.m_age &&
+            lhs.m_salary == rhs.m_salary;
+}
+```
+
+步骤2：对自定义类的对象进行序列化：
+
+```
+    std::vector<MyTest> n;
+    n.push_back(MyTest("aaa", 111, 222));
+    n.push_back(MyTest("bbb", 222, 333));
+    n.push_back(MyTest("ccc", 333, 444));
+
+    OutStream os;
+    os << n;
+    std::string serializestr = os.str();
+
+    std::vector<MyTest> n1;
+
+    InStream is(serializestr);
+    is >> n1;
+```
+
+
+- 3、对于std::list的序列化:
+
+```
+    std::list<std::string> strarr;
+    strarr.push_back("hello");
+    strarr.push_back("world");
+    strarr.push_back("hello");
+
+    OutStream os;
+    os << strarr;
+
+    std::string codestr = os.str();
+
+    std::list<std::string> newstrarr;
+    InStream is(codestr);
+    is>>newstrarr;
+```
+
+- 4、对于std::set的序列化:
+
+```
+    std::set<std::string> strarr;
+    strarr.insert("hello");
+    strarr.insert("world");
+    strarr.insert("hello");
+
+    OutStream os;
+    os << strarr;
+
+    std::string codestr = os.str();
+
+    std::set<std::string> newstrarr;
+    InStream is(codestr);
+    is>>newstrarr;
+```
+
+- 5、对于std::map的序列化:
+
+```
+    std::map<std::string, int> themap;
+    themap["first"] = 1;
+    themap["second"] = 2;
+    themap["third"] = 3;
+    themap["fourth"] = 4;
+
+    OutStream os;
+    os << themap;
+
+    std::string codestr = os.str();
+
+    std::map<std::string, int> newmap;
+    InStream is(codestr);
+    is>>newmap;
+```
+
+## 五、FAQ
+
