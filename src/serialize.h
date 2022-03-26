@@ -32,7 +32,7 @@ int deserialize ( std::string &str, SerializableType& a )
 /////////////////////////////////////////////////
 #define DEF_BASIC_TYPE_SERIALIZE(Type) \
  template<> \
-std::string serialize(Type& b) \
+std::string inline serialize(Type& b) \
 { \
         std::string ret; \
         ret.append((const char*)&b,sizeof(Type)); \
@@ -41,7 +41,7 @@ std::string serialize(Type& b) \
 
 #define DEF_BASIC_TYPE_DESERIALIZE(Type)  \
  template<> \
-int deserialize(std::string& str,Type& b)\
+int inline deserialize(std::string& str,Type& b)\
 { \
         memcpy(&b,str.data(),sizeof(Type)); \
         return sizeof(Type); \
@@ -70,7 +70,7 @@ DEF_BASIC_TYPE_SERIALIZE_AND_DESERIALIZE ( double )
 
 // for c++ type std::string
 template<>
-std::string serialize ( std::string& s )
+std::string inline serialize ( std::string& s )
 {
     int len = s.size ( );
     std::string ret;
@@ -80,7 +80,7 @@ std::string serialize ( std::string& s )
 }
 
 template<>
-int deserialize ( std::string &str, std::string& s )
+int inline deserialize ( std::string &str, std::string& s )
 {
     int len;
     ::deserialize ( str, len );
